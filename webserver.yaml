@@ -1,0 +1,80 @@
+---
+- name: first server
+  hosts: webserver01
+  tasks:
+    - name: install with yum
+      yum:
+       name: httpd
+       state: latest
+
+    - name: Copy index test page
+      template:
+        src: "/home/hamza/index.html"
+        dest: "/var/www/html/index.html"
+
+    - name: Insert block virutal hosts in httpd.conf
+      blockinfile:
+        path: /etc/httpd/conf/httpd.conf
+        insertafter: EOF 
+        block: |
+          NameVirtualHost *:80
+          <VirtualHost *:80>
+          ServerAdmin webmaster@localhost
+          ServerName www.webserver01.com
+          ServerAlias www.webserver01.com
+          DocumentRoot /var/www/html/
+          </VirtualHost>
+
+    - name: Insert in hosts 
+      blockinfile:
+        path: /etc/hosts
+        insertafter: EOF 
+        block: |
+          192.168.211.129 www.webserver01.com
+
+    - name: Enable and start httpd server
+      service:
+        name: httpd
+        enabled: yes
+        state: started
+
+- name: seconde server
+  hosts: webserver02
+  tasks:
+    - name: install with yum
+      yum:
+       name: httpd
+       state: latest
+
+    - name: Copy index test page
+      template:
+        src: "/home/hamza/index.html"
+        dest: "/var/www/html/index.html"
+
+    - name: Insert block virutal hosts in httpd.conf
+      blockinfile:
+        path: /etc/httpd/conf/httpd.conf
+        insertafter: EOF 
+        block: |
+          NameVirtualHost *:80
+          <VirtualHost *:80>
+          ServerAdmin webmaster@localhost
+          ServerName www.webserver02.com
+          ServerAlias www.webserver02.com
+          DocumentRoot /var/www/html/
+          </VirtualHost>
+
+    - name: Insert in hosts 
+      blockinfile:
+        path: /etc/hosts
+        insertafter: EOF 
+        block: |
+          192.168.211.132 www.webserver02.com
+
+    - name: Enable and start httpd server
+      service:
+        name: httpd
+        enabled: yes
+        state: started
+
+
